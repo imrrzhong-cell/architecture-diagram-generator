@@ -1,0 +1,419 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "CRM系统视觉语法：如何将语义结构映射成可视化图形"
+  },
+
+  "visual_grammar": {
+    "topology_grammar": {
+      "layout_type": "matrix",
+      "structure": {
+        "rows": "business_layers",
+        "columns": "terminals",
+        "cells": "business_units"
+      },
+      "grid_specification": {
+        "total_columns": 4,
+        "column_width": {
+          "PC_Web": 380,
+          "Mobile_App": 380,
+          "Mobile_Web": 380,
+          "Open_API": 380
+        },
+        "total_rows": 7,
+        "row_height": "auto",
+        "row_heights": {
+          "接入层（终端/渠道）": 60,
+          "业务场景层": 180,
+          "用户角色层": 120,
+          "核心系统层": 220,
+          "业务支撑层": 100,
+          "数据层": 100,
+          "基础设施层": 100
+        }
+      },
+      "alignment_rules": {
+        "horizontal": {
+          "rule": "align_by_terminal",
+          "description": "按终端平台水平对齐"
+        },
+        "vertical": {
+          "rule": "align_by_business_layer",
+          "description": "按业务层级垂直对齐"
+        },
+        "cell_alignment": {
+          "horizontal": "left",
+          "vertical": "top",
+          "padding": 8
+        }
+      }
+    },
+
+    "visual_encoding": {
+      "color_encoding": {
+        "strategy": "encode_color_by_domain",
+        "palette": {
+          "blue": {
+            "hex": "#1890FF",
+            "rgb": [24, 144, 255],
+            "meaning": "核心业务层 - 客户与销售",
+            "apply_to": ["客户管理", "销售管理", "客户中心", "销售中心", "销售团队"]
+          },
+          "green": {
+            "hex": "#52C41A",
+            "rgb": [82, 196, 26],
+            "meaning": "营销增长层",
+            "apply_to": ["营销管理", "营销中心", "市场团队", "客户画像", "营销自动化"]
+          },
+          "orange": {
+            "hex": "#FA8C16",
+            "rgb": [250, 140, 22],
+            "meaning": "服务支持层",
+            "apply_to": ["服务管理", "服务中心", "服务团队", "知识库", "工单系统"]
+          },
+          "purple": {
+            "hex": "#722ED1",
+            "rgb": [114, 46, 209],
+            "meaning": "数据智能层",
+            "apply_to": ["数据分析", "BI平台", "预测分析", "管理层", "报表分析"]
+          },
+          "gray": {
+            "hex": "#8C8C8C",
+            "rgb": [140, 140, 140],
+            "meaning": "基础设施层",
+            "apply_to": ["用户中心", "工作流引擎", "文件服务", "管理员"]
+          },
+          "cyan": {
+            "hex": "#13C2C2",
+            "rgb": [19, 194, 194],
+            "meaning": "集成接口层",
+            "apply_to": ["Open_API", "集成平台", "第三方系统", "客户", "合作伙伴"]
+          }
+        }
+      },
+      "border_encoding": {
+        "strategy": "encode_border_by_system_type",
+        "rules": {
+          "core_system": {
+            "border_width": 2,
+            "border_color": "#1890FF",
+            "border_style": "solid",
+            "apply_to": ["客户中心", "销售中心", "营销中心", "服务中心"]
+          },
+          "support_system": {
+            "border_width": 1,
+            "border_color": "#52C41A",
+            "border_style": "dashed",
+            "apply_to": ["产品中心", "互动中心", "工作流引擎"]
+          },
+          "infrastructure": {
+            "border_width": 1,
+            "border_color": "#8C8C8C",
+            "border_style": "solid",
+            "apply_to": ["用户中心", "文件服务", "集成平台", "BI平台"]
+          },
+          "api": {
+            "border_width": 2,
+            "border_color": "#13C2C2",
+            "border_style": "dotted",
+            "apply_to": ["Open_API", "集成平台"]
+          }
+        }
+      },
+      "font_encoding": {
+        "strategy": "encode_font_weight_by_hierarchy",
+        "rules": {
+          "level_1": {
+            "font_size": 20,
+            "font_weight": "bold",
+            "color": "#000000",
+            "apply_to": ["页面标题", "列标题"]
+          },
+          "level_2": {
+            "font_size": 16,
+            "font_weight": "600",
+            "color": "#333333",
+            "apply_to": ["行标题", "分组标题"]
+          },
+          "level_3": {
+            "font_size": 14,
+            "font_weight": "500",
+            "color": "#333333",
+            "apply_to": ["系统名称"]
+          },
+          "level_4": {
+            "font_size": 12,
+            "font_weight": "normal",
+            "color": "#666666",
+            "apply_to": ["模块标签"]
+          }
+        }
+      },
+      "spacing_encoding": {
+        "strategy": "encode_spacing_by_semantic_grouping",
+        "rules": {
+          "cell_padding": 8,
+          "row_gap": 2,
+          "column_gap": 2,
+          "section_margin": 12,
+          "group_margin": 6,
+          "module_gap": 4
+        }
+      },
+      "icon_encoding": {
+        "strategy": "minimal_icons",
+        "rules": {
+          "use_simple_icons": true,
+          "icon_size": 16,
+          "icon_color_match_text": true
+        }
+      }
+    },
+
+    "layout_constraints": {
+      "information_density": {
+        "min_cells_per_row": 3,
+        "max_cells_per_row": 8,
+        "label_max_length": 16,
+        "cell_min_width": 120,
+        "cell_min_height": 40,
+        "max_modules_per_group": 10
+      },
+      "readability": {
+        "max_modules_per_cell": 12,
+        "text_line_height": 1.6,
+        "character_spacing": 0,
+        "paragraph_spacing": 8
+      },
+      "visual_hierarchy": {
+        "preserve_row_continuity": true,
+        "preserve_cell_boundaries": true,
+        "group_related_modules": true,
+        "maintain_consistent_spacing": true,
+        "clear_domain_separation": true
+      },
+      "accessibility": {
+        "color_contrast_ratio": 4.5,
+        "text_alternatives": true,
+        "keyboard_navigable": true
+      }
+    },
+
+    "rendering_grammar": {
+      "design_principles": {
+        "minimal_icons": true,
+        "subtle_gradients": false,
+        "no_shadows": true,
+        "flat_design": true,
+        "no_visual_noise": true,
+        "professional_style": true
+      },
+      "typography": {
+        "font_family": ["PingFang SC", "Helvetica Neue", "Arial", "sans-serif"],
+        "font_smoothing": "antialiased",
+        "text_align": "left",
+        "line_height": 1.6
+      },
+      "grid_system": {
+        "type": "CSS Grid",
+        "columns": 4,
+        "column_gap": 2,
+        "row_gap": 2,
+        "margin": 16
+      },
+      "components": {
+        "header": {
+          "background_color": "#1890FF",
+          "text_color": "#FFFFFF",
+          "height": 60,
+          "alignment": "center",
+          "font_size": 20,
+          "font_weight": "bold"
+        },
+        "column_header": {
+          "background_color": "#1890FF",
+          "text_color": "#FFFFFF",
+          "height": 50,
+          "alignment": "center",
+          "font_size": 16,
+          "font_weight": "600"
+        },
+        "row_header": {
+          "background_color": "#F0F0F0",
+          "text_color": "#333333",
+          "font_weight": "600",
+          "padding": 12,
+          "font_size": 14
+        },
+        "cell": {
+          "background_color": "#FFFFFF",
+          "border_width": 1,
+          "border_color": "#E0E0E0",
+          "border_radius": 4,
+          "padding": 8
+        },
+        "group_title": {
+          "display": "block",
+          "padding": "4px 8px",
+          "margin_bottom": 6,
+          "border_radius": 2,
+          "font_size": 13,
+          "font_weight": "600"
+        },
+        "module_tag": {
+          "display": "inline-block",
+          "padding": "3px 8px",
+          "margin": "2px",
+          "background_color": "#F5F5F5",
+          "border_radius": 3,
+          "font_size": 11,
+          "line_height": 1.5,
+          "border_width": 1,
+          "border_color": "#E0E0E0",
+          "transition": "all 0.2s"
+        },
+        "module_tag_hover": {
+          "background_color": "#E6F7FF",
+          "border_color": "#1890FF",
+          "cursor": "pointer",
+          "transform": "translateY(-1px)"
+        }
+      },
+      "color_schemes": {
+        "light_mode": {
+          "background": "#FFFFFF",
+          "text_primary": "#333333",
+          "text_secondary": "#666666",
+          "border": "#E0E0E0"
+        },
+        "domain_colors": {
+          "customer": "#1890FF",
+          "sales": "#1890FF",
+          "marketing": "#52C41A",
+          "service": "#FA8C16",
+          "analytics": "#722ED1",
+          "infrastructure": "#8C8C8C",
+          "api": "#13C2C2"
+        }
+      }
+    },
+
+    "interaction_design": {
+      "hover_effects": {
+        "cell_hover": {
+          "background_color": "#F8F8F8",
+          "cursor": "default"
+        },
+        "module_tag_hover": {
+          "background_color": "#E6F7FF",
+          "border_color": "#1890FF",
+          "cursor": "pointer",
+          "box_shadow": "0 2px 4px rgba(24, 144, 255, 0.2)"
+        },
+        "group_title_hover": {
+          "cursor": "pointer"
+        }
+      },
+      "click_actions": {
+        "module_tag_click": {
+          "action": "show_module_details",
+          "animation": "fade_in"
+        },
+        "group_title_click": {
+          "action": "toggle_group_expansion",
+          "animation": "slide_toggle"
+        }
+      },
+      "selection_indicators": {
+        "selected_cell": {
+          "border_color": "#1890FF",
+          "border_width": 2,
+          "box_shadow": "0 0 0 3px rgba(24, 144, 255, 0.1)"
+        },
+        "selected_module": {
+          "background_color": "#1890FF",
+          "color": "#FFFFFF"
+        }
+      },
+      "animations": {
+        "duration": 200,
+        "easing": "ease-in-out",
+        "fade_in": true,
+        "slide_toggle": true
+      }
+    },
+
+    "responsive_design": {
+      "breakpoints": {
+        "desktop": {
+          "min_width": 1200,
+          "columns": 4,
+          "cell_padding": 8
+        },
+        "laptop": {
+          "min_width": 992,
+          "max_width": 1199,
+          "columns": 3,
+          "cell_padding": 6
+        },
+        "tablet": {
+          "min_width": 768,
+          "max_width": 991,
+          "columns": 2,
+          "cell_padding": 6
+        },
+        "mobile": {
+          "max_width": 767,
+          "columns": 1,
+          "cell_padding": 4
+        }
+      },
+      "font_scaling": {
+        "desktop": 100,
+        "laptop": 95,
+        "tablet": 90,
+        "mobile": 85
+      }
+    },
+
+    "accessibility": {
+      "color_contrast": {
+        "minimum_ratio": 4.5,
+        "text_on_background": true,
+        "text_on_color": true
+      },
+      "text_alternatives": {
+        "provide_alt_text": true,
+        "descriptive_labels": true,
+        "aria_labels": true
+      },
+      "keyboard_navigation": {
+        "tab_index": true,
+        "focus_indicators": true,
+        "shortcuts": true
+      },
+      "screen_reader": {
+        "semantic_html": true,
+        "landmarks": true,
+        "labels": true
+      }
+    },
+
+    "export_settings": {
+      "formats": ["PNG", "SVG", "PDF"],
+      "dpi": 300,
+      "color_space": "RGB",
+      "compression": "lossless",
+      "dimensions": {
+        "width": 1600,
+        "height": 2000,
+        "maintain_aspect_ratio": true
+      },
+      "print_settings": {
+        "page_size": "A3",
+        "orientation": "landscape",
+        "margins": 10
+      }
+    }
+  }
+}

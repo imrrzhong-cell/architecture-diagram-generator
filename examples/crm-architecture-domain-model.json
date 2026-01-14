@@ -1,0 +1,394 @@
+{
+  "meta": {
+    "version": "1.0",
+    "created": "2025-01-14",
+    "title": "CRM系统完整架构"
+  },
+
+  "domain_model": {
+    "entities": {
+      "platform_types": {
+        "PC_Web": {
+          "type": "Terminal",
+          "description": "桌面端访问，适合复杂操作和数据分析",
+          "target_users": ["销售经理", "市场总监", "客服主管", "系统管理员"]
+        },
+        "Mobile_App": {
+          "type": "Terminal",
+          "description": "移动端原生应用，支持外勤和移动办公",
+          "target_users": ["销售人员", "市场专员", "客服人员"]
+        },
+        "Mobile_Web": {
+          "type": "Terminal",
+          "description": "移动端浏览器，轻量级访问",
+          "target_users": ["客户", "合作伙伴"]
+        },
+        "Open_API": {
+          "type": "Terminal",
+          "description": "开放API，支持第三方系统集成",
+          "target_users": ["ERP系统", "电商平台", "呼叫中心", "BI工具"]
+        }
+      },
+
+      "business_scenarios": {
+        "customer_management": {
+          "name": "客户管理",
+          "type": "BusinessScenario",
+          "domain": "Customer",
+          "description": "客户信息的全生命周期管理",
+          "modules": ["客户档案", "客户分层", "客户标签", "客户画像", "客户360视图", "联系人管理", "客户公海池"]
+        },
+        "sales_management": {
+          "name": "销售管理",
+          "type": "BusinessScenario",
+          "domain": "Sales",
+          "description": "销售全流程管理",
+          "modules": ["线索管理", "商机管理", "报价管理", "合同管理", "订单管理", "销售预测", "销售漏斗", "外勤管理"]
+        },
+        "marketing_management": {
+          "name": "营销管理",
+          "type": "BusinessScenario",
+          "domain": "Marketing",
+          "description": "营销活动与客户触达",
+          "modules": ["营销活动", "客户旅程", "内容管理", "多渠道营销", "营销自动化", "效果分析", "客户生命周期管理"]
+        },
+        "service_management": {
+          "name": "服务管理",
+          "type": "BusinessScenario",
+          "domain": "Service",
+          "description": "客户服务与支持",
+          "modules": ["工单管理", "客服知识库", "在线客服", "呼叫中心", "客户反馈", "服务评价", "SLA管理"]
+        },
+        "data_analytics": {
+          "name": "数据分析",
+          "type": "BusinessScenario",
+          "domain": "Analytics",
+          "description": "业务数据洞察与决策支持",
+          "modules": ["销售分析", "客户分析", "营销分析", "服务分析", "预测分析", "自定义报表", "实时大屏"]
+        }
+      },
+
+      "user_roles": {
+        "sales_team": {
+          "name": "销售团队",
+          "type": "InternalUser",
+          "roles": ["销售代表", "销售经理", "销售总监", "外勤销售"],
+          "permissions": ["客户查看", "线索管理", "商机跟进", "合同签订", "业绩查看"]
+        },
+        "marketing_team": {
+          "name": "市场团队",
+          "type": "InternalUser",
+          "roles": ["市场专员", "市场经理", "市场总监"],
+          "permissions": ["活动创建", "客户分群", "内容发布", "营销效果查看"]
+        },
+        "service_team": {
+          "name": "服务团队",
+          "type": "InternalUser",
+          "roles": ["客服专员", "客服主管", "技术支持"],
+          "permissions": ["工单处理", "知识库维护", "客户反馈查看"]
+        },
+        "management": {
+          "name": "管理层",
+          "type": "InternalUser",
+          "roles": ["CEO/总经理", "业务总监", "运营总监"],
+          "permissions": ["全数据查看", "战略分析", "决策报表"]
+        },
+        "admin": {
+          "name": "管理员",
+          "type": "InternalUser",
+          "roles": ["系统管理员", "数据管理员"],
+          "permissions": ["系统配置", "权限管理", "数据维护"]
+        },
+        "customers": {
+          "name": "客户",
+          "type": "ExternalUser",
+          "roles": ["潜在客户", "正式客户", "VIP客户"],
+          "permissions": ["个人信息查看", "订单查询", "服务请求"]
+        },
+        "partners": {
+          "name": "合作伙伴",
+          "type": "ExternalUser",
+          "roles": ["经销商", "代理商", "服务提供商"],
+          "permissions": ["客户共享", "订单协同", "数据对接"]
+        }
+      },
+
+      "core_systems": {
+        "customer_center": {
+          "name": "客户中心",
+          "type": "CoreSystem",
+          "domain": "Customer",
+          "description": "客户信息的统一管理中心",
+          "modules": ["客户主数据", "客户标签引擎", "客户画像", "客户360", "公海池管理", "客户合并/去重", "客户导入/导出"],
+          "data_entities": ["客户基本信息", "联系人", "客户分类", "客户标签", "客户行为数据"]
+        },
+        "sales_center": {
+          "name": "销售中心",
+          "type": "CoreSystem",
+          "domain": "Sales",
+          "description": "销售全流程管理",
+          "modules": ["线索管理", "商机管理", "报价管理", "合同管理", "订单管理", "回款管理", "销售预测", "外勤定位"],
+          "data_entities": ["线索", "商机", "报价单", "合同", "订单", "回款记录", "销售预测"]
+        },
+        "marketing_center": {
+          "name": "营销中心",
+          "type": "CoreSystem",
+          "domain": "Marketing",
+          "description": "营销活动管理与自动化",
+          "modules": ["营销活动", "客户旅程", "内容库", "邮件营销", "短信营销", "微信营销", "营销自动化", "效果分析"],
+          "data_entities": ["活动", "旅程", "内容", "营销记录", "触达记录"]
+        },
+        "service_center": {
+          "name": "服务中心",
+          "type": "CoreSystem",
+          "domain": "Service",
+          "description": "客户服务与支持管理",
+          "modules": ["工单系统", "知识库", "在线客服", "呼叫中心", "客户反馈", "满意度调查", "SLA管理"],
+          "data_entities": ["工单", "知识条目", "客服记录", "反馈", "满意度"]
+        },
+        "product_center": {
+          "name": "产品中心",
+          "type": "SupportSystem",
+          "domain": "Product",
+          "description": "产品/服务信息管理",
+          "modules": ["产品管理", "价格管理", "库存管理", "产品分类"],
+          "data_entities": ["产品", "价格表", "库存"]
+        },
+        "interaction_center": {
+          "name": "互动中心",
+          "type": "SupportSystem",
+          "domain": "Interaction",
+          "description": "全渠道客户互动管理",
+          "modules": ["通话管理", "邮件管理", "短信管理", "微信管理", "webhook", "互动记录"],
+          "data_entities": ["通话记录", "邮件", "短信", "微信消息"]
+        }
+      },
+
+      "data_layer": {
+        "customer_data": {
+          "name": "客户数据域",
+          "type": "DataDomain",
+          "description": "客户相关的所有数据",
+          "tables": ["客户表", "联系人表", "客户标签表", "客户行为表", "客户画像表"]
+        },
+        "sales_data": {
+          "name": "销售数据域",
+          "type": "DataDomain",
+          "description": "销售流程相关数据",
+          "tables": ["线索表", "商机表", "报价表", "合同表", "订单表", "回款表"]
+        },
+        "marketing_data": {
+          "name": "营销数据域",
+          "type": "DataDomain",
+          "description": "营销活动相关数据",
+          "tables": ["活动表", "旅程表", "内容表", "营销记录表", "效果数据表"]
+        },
+        "service_data": {
+          "name": "服务数据域",
+          "type": "DataDomain",
+          "description": "客户服务相关数据",
+          "tables": ["工单表", "知识库表", "客服记录表", "反馈表", "满意度表"]
+        },
+        "interaction_data": {
+          "name": "互动数据域",
+          "type": "DataDomain",
+          "description": "客户互动历史数据",
+          "tables": ["通话记录表", "邮件表", "短信表", "微信消息表", "互动汇总表"]
+        },
+        "system_data": {
+          "name": "系统数据域",
+          "type": "DataDomain",
+          "description": "系统管理相关数据",
+          "tables": ["用户表", "权限表", "角色表", "组织架构表", "日志表"]
+        }
+      },
+
+      "infrastructure": {
+        "user_center": {
+          "name": "用户中心",
+          "type": "Infrastructure",
+          "description": "统一的用户认证与授权",
+          "modules": ["用户认证", "单点登录(SSO)", "权限管理(RBAC)", "组织架构", "用户画像"]
+        },
+        "workflow_engine": {
+          "name": "工作流引擎",
+          "type": "Infrastructure",
+          "description": "业务流程编排",
+          "modules": ["流程设计", "流程执行", "流程监控", "流程优化"]
+        },
+        "notification_service": {
+          "name": "通知服务",
+          "type": "Infrastructure",
+          "description": "多渠道消息通知",
+          "modules": ["站内消息", "邮件通知", "短信通知", "推送通知", "消息模板"]
+        },
+        "file_service": {
+          "name": "文件服务",
+          "type": "Infrastructure",
+          "description": "文件存储与管理",
+          "modules": ["文件上传", "文件存储", "文件预览", "文件分享", "OCR识别"]
+        },
+        "integration_platform": {
+          "name": "集成平台",
+          "type": "Infrastructure",
+          "description": "第三方系统集成",
+          "modules": ["API网关", "数据同步", "ETL", "集成适配器", "数据映射"]
+        },
+        "bi_platform": {
+          "name": "BI平台",
+          "type": "Infrastructure",
+          "description": "商业智能与数据分析",
+          "modules": ["数据仓库", "OLAP引擎", "报表引擎", "可视化工具", "预测分析"]
+        },
+        "search_engine": {
+          "name": "搜索引擎",
+          "type": "Infrastructure",
+          "description": "全文检索与智能搜索",
+          "modules": ["全文索引", "智能搜索", "搜索推荐", "搜索分析"]
+        }
+      }
+    },
+
+    "relations": {
+      "is-a": [
+        "PC_Web is-a Terminal",
+        "客户管理 is-a BusinessScenario",
+        "销售团队 is-a InternalUser"
+      ],
+      "part-of": [
+        "客户中心 part-of CoreSystem",
+        "客户数据域 part-of DataLayer",
+        "用户中心 part-of Infrastructure"
+      ],
+      "maps-to": [
+        "PC_Web maps-to 复杂业务场景",
+        "Mobile_App maps-to 移动办公场景",
+        "Open_API maps-to 第三方集成"
+      ],
+      "supported-by": [
+        "客户管理 supported-by 客户中心",
+        "销售管理 supported-by 销售中心",
+        "营销管理 supported-by 营销中心",
+        "服务管理 supported-by 服务中心"
+      ],
+      "belongs-to": [
+        "客户中心 belongs-to CustomerDomain",
+        "销售中心 belongs-to SalesDomain",
+        "营销中心 belongs-to MarketingDomain"
+      ],
+      "depends-on": [
+        "销售中心 depends-on 客户中心",
+        "营销中心 depends-on 客户中心",
+        "服务中心 depends-on 客户中心",
+        "所有业务系统 depends-on 用户中心"
+      ],
+      "flows-to": [
+        "线索 flows-to 商机",
+        "商机 flows-to 报价",
+        "报价 flows-to 合同",
+        "合同 flows-to 订单",
+        "订单 flows-to 回款"
+      ]
+    },
+
+    "hierarchy": {
+      "L1": "接入层（终端/渠道）",
+      "L2": "业务场景层",
+      "L3": "用户角色层",
+      "L4": "核心系统层",
+      "L5": "业务支撑层",
+      "L6": "数据层",
+      "L7": "基础设施层"
+    },
+
+    "domain_dictionary": {
+      "CRM": "Customer Relationship Management - 客户关系管理",
+      "SLA": "Service Level Agreement - 服务水平协议",
+      "SSO": "Single Sign-On - 单点登录",
+      "RBAC": "Role-Based Access Control - 基于角色的访问控制",
+      "BI": "Business Intelligence - 商业智能",
+      "ETL": "Extract, Transform, Load - 数据抽取转换加载",
+      "OLAP": "Online Analytical Processing - 联机分析处理",
+      "SFA": "Sales Force Automation - 销售自动化",
+      "MA": "Marketing Automation - 营销自动化",
+      "CSS": "Customer Service & Support - 客户服务与支持",
+      "360视图": "Customer 360 View - 客户360度全景视图"
+    },
+
+    "constraints": {
+      "business": [
+        "线索必须分配给销售人员",
+        "商机必须关联客户",
+        "合同必须经过审批流程",
+        "客户敏感信息需要权限控制",
+        "重要客户需要专属服务"
+      ],
+      "technical": [
+        "所有业务操作需要记录审计日志",
+        "客户数据需要实时同步",
+        "报表数据支持T+1和实时查询",
+        "接口调用需要限流和鉴权",
+        "文件上传需要安全扫描"
+      ],
+      "data": [
+        "客户主数据唯一性",
+        "销售流程数据完整性",
+        "互动记录时序性",
+        "数据分析数据一致性"
+      ]
+    },
+
+    "business_process": {
+      "销售流程": [
+        "线索获取 → 线索分配 → 线索跟进 → 线索转化",
+        "商机创建 → 需求分析 → 方案制定 → 报价",
+        "合同谈判 → 合同签订 → 合同执行",
+        "订单生成 → 订单履行 → 回款管理"
+      ],
+      "营销流程": [
+        "目标客户分群 → 营销活动设计 → 内容准备",
+        "多渠道触达 → 客户响应收集",
+        "效果分析 → 策略优化"
+      ],
+      "服务流程": [
+        "问题提交 → 工单创建 → 工单分配 → 问题处理",
+        "客户反馈 → 满意度调查 → 服务改进"
+      ]
+    },
+
+    "visual_encoding": {
+      "colors": {
+        "blue": {
+          "hex": "#1890FF",
+          "meaning": "核心业务层",
+          "apply_to": ["客户管理", "销售管理", "客户中心", "销售中心"]
+        },
+        "green": {
+          "hex": "#52C41A",
+          "meaning": "营销增长层",
+          "apply_to": ["营销管理", "营销中心", "客户画像"]
+        },
+        "orange": {
+          "hex": "#FA8C16",
+          "meaning": "服务支持层",
+          "apply_to": ["服务管理", "服务中心", "知识库"]
+        },
+        "purple": {
+          "hex": "#722ED1",
+          "meaning": "数据智能层",
+          "apply_to": ["数据分析", "BI平台", "预测分析"]
+        },
+        "gray": {
+          "hex": "#8C8C8C",
+          "meaning": "基础设施层",
+          "apply_to": ["用户中心", "工作流引擎", "文件服务"]
+        },
+        "cyan": {
+          "hex": "#13C2C2",
+          "meaning": "集成接口层",
+          "apply_to": ["集成平台", "Open_API"]
+        }
+      }
+    }
+  }
+}

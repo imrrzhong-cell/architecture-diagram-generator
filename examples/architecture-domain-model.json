@@ -1,0 +1,276 @@
+{
+  "meta": {
+    "version": "1.0",
+    "created": "2025-01-14",
+    "title": "九九电商平台产品完整架构"
+  },
+
+  "domain_model": {
+    "entities": {
+      "platform_types": {
+        "PC站": {
+          "type": "Terminal",
+          "description": "桌面端访问平台"
+        },
+        "移动端APP": {
+          "type": "Terminal",
+          "description": "移动端原生应用"
+        },
+        "小程序": {
+          "type": "Terminal",
+          "description": "轻量化移动端应用"
+        }
+      },
+
+      "business_scenarios": {
+        "supply_business": {
+          "name": "供给业务",
+          "type": "BusinessScenario",
+          "domain": "SupplyChain",
+          "modules": ["调拨业务", "推产业务", "开店营销", "上架接单", "黄金流盘", "智能采购", "平台运营", "合同协同"]
+        },
+        "controlled_distribution": {
+          "name": "控销业务",
+          "type": "BusinessScenario",
+          "domain": "Distribution",
+          "modules": ["控销业务", "合营业务", "对账开票", "履约结算", "经营赋能", "金融支付", "客户生命周期运营管理", "平台设置/健康度运营管理", "合同协同（续）"]
+        }
+      },
+
+      "user_roles": {
+        "upstream_industry": {
+          "name": "上游工业",
+          "type": "Supplier",
+          "domain": "SupplyChain",
+          "roles": ["大物流品种", "合营品种", "平台商户", "自营商户", "三方商户"]
+        },
+        "downstream_customers": {
+          "name": "下游客户",
+          "type": "Customer",
+          "domain": "Distribution",
+          "roles": ["单体药店", "中小连锁", "开放平台(ISV)"]
+        },
+        "platform": {
+          "name": "平台",
+          "type": "Platform",
+          "roles": ["地址", "营销", "采购", "财务", "物流"]
+        },
+        "partners": {
+          "name": "合作伙伴",
+          "type": "Partner",
+          "roles": ["物流服务商", "金融服务商"]
+        },
+        "others": {
+          "name": "其他",
+          "type": "Other",
+          "roles": ["支付服务商"]
+        }
+      },
+
+      "operation_systems": {
+        "customer_center": {
+          "name": "客户中心",
+          "type": "BusinessSystem",
+          "domain": "Customer",
+          "modules": ["注册建档", "客户标签", "会员管理", "主营品类"]
+        },
+        "product_center": {
+          "name": "商品中心",
+          "type": "BusinessSystem",
+          "domain": "Product",
+          "modules": ["商品主数据", "对码服务", "比价管理", "品类管理"]
+        },
+        "pricing_center": {
+          "name": "价格中心",
+          "type": "BusinessSystem",
+          "domain": "Pricing",
+          "modules": ["价格中心", "黄金内容"]
+        },
+        "live_streaming": {
+          "name": "平台直播",
+          "type": "BusinessSystem",
+          "domain": "Marketing",
+          "modules": ["自营店铺", "直播运营"]
+        },
+        "shop_center": {
+          "name": "店铺中心",
+          "type": "BusinessSystem",
+          "domain": "Commerce",
+          "modules": ["旗舰店"]
+        },
+        "third_party_shop": {
+          "name": "三方店铺",
+          "type": "BusinessSystem",
+          "domain": "Commerce",
+          "modules": ["三方店铺", "运营后台"]
+        },
+        "customer_service": {
+          "name": "客服中心",
+          "type": "BusinessSystem",
+          "domain": "Service",
+          "modules": ["呼叫中心", "任务中心", "知识库", "问题库", "问询销售"]
+        },
+        "im_system": {
+          "name": "IM系统",
+          "type": "BusinessSystem",
+          "domain": "Service",
+          "modules": ["IM系统", "投诉系统", "客服管理"]
+        }
+      },
+
+      "transaction_systems": {
+        "order_management": {
+          "name": "订单规则",
+          "type": "CoreSystem",
+          "domain": "Transaction",
+          "modules": ["订单规则", "订单状态", "订单创建", "拆分打标", "订单转移", "履约控制", "订单台账", "订单管理", "订单结算", "订单售后"]
+        },
+        "procurement_center": {
+          "name": "采购中心",
+          "type": "CoreSystem",
+          "domain": "Procurement",
+          "modules": ["寻源策略", "供应商库及主数据", "供应商评价及绩效管理", "采购策略管理", "物流系统", "出入库管理", "库位管理", "库存管理", "订单台账", "运输计划"]
+        },
+        "procurement_collaboration": {
+          "name": "采购协同",
+          "type": "CoreSystem",
+          "domain": "Procurement",
+          "modules": ["采购协同", "电子报投标", "行业监测", "开放平台", "仓内作业管理", "盘库管理", "盘库转移", "车辆调度", "运输执行", "运输计划", "成本核算", "分摊管理"]
+        }
+      },
+
+      "bi_systems": {
+        "data_platform": {
+          "name": "数据平台",
+          "type": "BISystem",
+          "domain": "Data",
+          "modules": ["数据采集", "数据梳理", "数据应用", "数据管理"]
+        },
+        "analytics": {
+          "name": "分析平台",
+          "type": "BISystem",
+          "domain": "Analytics",
+          "modules": ["物流分析", "财务模型", "财务分析", "可视化报表", "流量分析", "交易分析", "营销分析"]
+        }
+      },
+
+      "infrastructure": {
+        "payment_center": {
+          "name": "支付中心",
+          "type": "Infrastructure",
+          "domain": "Payment",
+          "modules": ["支付配置", "渠道管理", "费率管理", "费用结算"]
+        },
+        "finance_center": {
+          "name": "财务中心",
+          "type": "Infrastructure",
+          "domain": "Finance",
+          "modules": ["财务管理", "全面预算", "金融服务", "费用结算"]
+        },
+        "finance_service": {
+          "name": "金融中心",
+          "type": "Infrastructure",
+          "domain": "Finance",
+          "modules": ["白条/金条", "用户画像", "风险模型", "黄金方"]
+        },
+        "open_platform": {
+          "name": "开放平台",
+          "type": "Infrastructure",
+          "domain": "Platform",
+          "modules": ["API", "EDI"]
+        }
+      }
+    },
+
+    "relations": {
+      "is-a": [
+        "供给业务 is-a BusinessScenario",
+        "控销业务 is-a BusinessScenario",
+        "上游工业 is-a Supplier"
+      ],
+      "part-of": [
+        "客户中心 part-of 业务运营系统",
+        "订单规则 part-of 交易及履约系统",
+        "支付中心 part-of 基础服务平台"
+      ],
+      "maps-to": [
+        "PC站 maps-to 企业采购场景",
+        "移动端APP maps-to 移动办公场景",
+        "小程序 maps-to 零售终端场景"
+      ],
+      "supported-by": [
+        "订单规则 supported-by 支付中心",
+        "采购中心 supported-by 物流系统",
+        "价格中心 supported-by 财务模型"
+      ],
+      "belongs-to": [
+        "客户中心 belongs-to CustomerDomain",
+        "订单规则 belongs-to TransactionDomain",
+        "支付中心 belongs-to InfrastructureDomain"
+      ]
+    },
+
+    "hierarchy": {
+      "L1": "交易平台类型",
+      "L2": "业务场景",
+      "L3": "用户角色",
+      "L4": "业务运营系统",
+      "L5": "交易及履约系统",
+      "L6": "供应链系统",
+      "L7": "经营决策系统(BI)",
+      "L8": "基础服务平台"
+    },
+
+    "domain_dictionary": {
+      "三方商户": "Third-party Merchant",
+      "自营商户": "Self-operated Merchant",
+      "合营业务": "Joint Venture Business",
+      "配供业务": "Supply & Distribution",
+      "控销业务": "Controlled Distribution",
+      "调拨业务": "Allocation Business",
+      "推产业务": "Push Business",
+      "ISV": "Independent Software Vendor"
+    },
+
+    "constraints": {
+      "business": [
+        "上游只能做供给业务",
+        "下游只能做控销业务",
+        "结算一定属于系统域",
+        "仓储一定属于供应链域"
+      ],
+      "layout": [
+        "按终端平台横向分列",
+        "按业务层级纵向分层",
+        "保持业务逻辑连贯性",
+        "相邻层级要有明确归属关系"
+      ]
+    },
+
+    "visual_encoding": {
+      "colors": {
+        "blue": "#4A90E2",
+        "blue_desc": "核心业务层",
+        "pink": "#FF69B4",
+        "pink_desc": "下游客户层",
+        "green": "#52C41A",
+        "green_desc": "运营支撑层",
+        "gray": "#8C8C8C",
+        "gray_desc": "平台/工具层"
+      },
+      "typography": {
+        "title_font": "PingFang SC, Helvetica, Arial",
+        "body_font": "PingFang SC, Helvetica, Arial",
+        "title_size": 24,
+        "body_size": 14,
+        "hierarchy_weight": "层级越高字体越大"
+      },
+      "spacing": {
+        "cell_padding": 8,
+        "row_gap": 2,
+        "column_gap": 2,
+        "section_margin": 16
+      }
+    }
+  }
+}

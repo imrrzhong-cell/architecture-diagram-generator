@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM系统完整架构</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1890FF 0%, #096dd9 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: 180px repeat(4, 1fr);
+            gap: 2px;
+            background: #e0e0e0;
+            padding: 2px;
+        }
+
+        .row-label {
+            background: #f5f5f5;
+            padding: 16px 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #333;
+            text-align: center;
+            writing-mode: horizontal-tb;
+        }
+
+        .column-header {
+            background: linear-gradient(135deg, #1890FF 0%, #096dd9 100%);
+            color: white;
+            padding: 16px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .column-header .sub {
+            display: block;
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .cell {
+            background: white;
+            padding: 10px;
+            min-height: 80px;
+        }
+
+        .cell-group {
+            margin-bottom: 10px;
+        }
+
+        .cell-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .group-title {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .group-title.blue {
+            background: #1890FF;
+            color: white;
+        }
+
+        .group-title.green {
+            background: #52C41A;
+            color: white;
+        }
+
+        .group-title.orange {
+            background: #FA8C16;
+            color: white;
+        }
+
+        .group-title.purple {
+            background: #722ED1;
+            color: white;
+        }
+
+        .group-title.gray {
+            background: #8C8C8C;
+            color: white;
+        }
+
+        .group-title.cyan {
+            background: #13C2C2;
+            color: white;
+        }
+
+        .modules-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .module-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+        }
+
+        .module-tag:hover {
+            background: #E6F7FF;
+            border-color: #1890FF;
+            color: #1890FF;
+            cursor: pointer;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+        }
+
+        .export-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .export-controls h3 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .export-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            margin-bottom: 8px;
+            background: #1890FF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #096dd9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+        }
+
+        .export-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1890FF;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        @media print {
+            .export-controls {
+                display: none;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        @media screen and (max-width: 1400px) {
+            .architecture-grid {
+                grid-template-columns: 150px repeat(4, 1fr);
+            }
+
+            .module-tag {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
+
+        @media screen and (max-width: 1200px) {
+            .architecture-grid {
+                grid-template-columns: 120px repeat(2, 1fr);
+                overflow-x: auto;
+            }
+
+            .column-header:nth-child(5),
+            .cell:nth-child(5n+2) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="export-controls">
+        <h3>导出选项</h3>
+        <button class="export-btn" onclick="exportToPDF()">导出为 PDF</button>
+        <button class="export-btn" onclick="window.print()">打印</button>
+        <button class="export-btn" onclick="toggleStats()">显示统计</button>
+    </div>
+
+    <div class="container" id="architecture">
+        <div class="header">
+            <h1>CRM系统完整架构</h1>
+            <p>客户关系管理系统 - 业务·技术·数据全面视图</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #1890FF;"></div>
+                <span>核心业务层（客户/销售）</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #52C41A;"></div>
+                <span>营销增长层</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FA8C16;"></div>
+                <span>服务支持层</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #722ED1;"></div>
+                <span>数据智能层</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #8C8C8C;"></div>
+                <span>基础设施层</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #13C2C2;"></div>
+                <span>集成接口层</span>
+            </div>
+        </div>
+
+        <div class="architecture-grid">
+            <!-- 列标题 -->
+            <div class="row-label">层级 \\ 终端</div>
+            <div class="column-header">
+                PC Web
+                <span class="sub">桌面端 · 复杂操作 · 数据分析</span>
+            </div>
+            <div class="column-header">
+                Mobile App
+                <span class="sub">移动端 · 外勤办公 · 实时跟进</span>
+            </div>
+            <div class="column-header">
+                Mobile Web
+                <span class="sub">轻量级 · 自助服务 · 快速访问</span>
+            </div>
+            <div class="column-header">
+                Open API
+                <span class="sub">开放接口 · 系统集成 · 数据同步</span>
+            </div>
+
+            <!-- 业务场景层 -->
+            <div class="row-label">业务场景层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户档案</span>
+                        <span class="module-tag">客户分层</span>
+                        <span class="module-tag">客户标签</span>
+                        <span class="module-tag">客户画像</span>
+                        <span class="module-tag">客户360视图</span>
+                        <span class="module-tag">联系人管理</span>
+                        <span class="module-tag">客户公海池</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索管理</span>
+                        <span class="module-tag">商机管理</span>
+                        <span class="module-tag">报价管理</span>
+                        <span class="module-tag">合同管理</span>
+                        <span class="module-tag">订单管理</span>
+                        <span class="module-tag">销售预测</span>
+                        <span class="module-tag">销售漏斗</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">营销管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">营销活动</span>
+                        <span class="module-tag">客户旅程</span>
+                        <span class="module-tag">内容管理</span>
+                        <span class="module-tag">多渠道营销</span>
+                        <span class="module-tag">营销自动化</span>
+                        <span class="module-tag">效果分析</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单管理</span>
+                        <span class="module-tag">客服知识库</span>
+                        <span class="module-tag">在线客服</span>
+                        <span class="module-tag">呼叫中心</span>
+                        <span class="module-tag">客户反馈</span>
+                        <span class="module-tag">SLA管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title purple">数据分析</div>
+                    <div class="modules-container">
+                        <span class="module-tag">销售分析</span>
+                        <span class="module-tag">客户分析</span>
+                        <span class="module-tag">营销分析</span>
+                        <span class="module-tag">服务分析</span>
+                        <span class="module-tag">预测分析</span>
+                        <span class="module-tag">自定义报表</span>
+                        <span class="module-tag">实时大屏</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户档案</span>
+                        <span class="module-tag">客户画像</span>
+                        <span class="module-tag">客户360视图</span>
+                        <span class="module-tag">联系人管理</span>
+                        <span class="module-tag">客户拜访</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索管理</span>
+                        <span class="module-tag">商机管理</span>
+                        <span class="module-tag">报价管理</span>
+                        <span class="module-tag">合同管理</span>
+                        <span class="module-tag">外勤签到</span>
+                        <span class="module-tag">销售打卡</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单处理</span>
+                        <span class="module-tag">客户反馈</span>
+                        <span class="module-tag">服务签到</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">服务管理</div>
+                    <div class="modules-container">
+                        <span class="module-tag">自助服务</span>
+                        <span class="module-tag">问题反馈</span>
+                        <span class="module-tag">服务查询</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">数据集成</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户数据同步</span>
+                        <span class="module-tag">订单数据同步</span>
+                        <span class="module-tag">库存数据同步</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title cyan">系统对接</div>
+                    <div class="modules-container">
+                        <span class="module-tag">ERP对接</span>
+                        <span class="module-tag">电商平台对接</span>
+                        <span class="module-tag">呼叫中心对接</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户角色层 -->
+            <div class="row-label">用户角色层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">销售团队</div>
+                    <div class="modules-container">
+                        <span class="module-tag">销售代表</span>
+                        <span class="module-tag">销售经理</span>
+                        <span class="module-tag">销售总监</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">市场团队</div>
+                    <div class="modules-container">
+                        <span class="module-tag">市场专员</span>
+                        <span class="module-tag">市场经理</span>
+                        <span class="module-tag">市场总监</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务团队</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客服专员</span>
+                        <span class="module-tag">客服主管</span>
+                        <span class="module-tag">技术支持</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title purple">管理层</div>
+                    <div class="modules-container">
+                        <span class="module-tag">CEO/总经理</span>
+                        <span class="module-tag">业务总监</span>
+                        <span class="module-tag">运营总监</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">管理员</div>
+                    <div class="modules-container">
+                        <span class="module-tag">系统管理员</span>
+                        <span class="module-tag">数据管理员</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">销售团队</div>
+                    <div class="modules-container">
+                        <span class="module-tag">销售代表</span>
+                        <span class="module-tag">外勤销售</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务团队</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客服专员</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">客户</div>
+                    <div class="modules-container">
+                        <span class="module-tag">正式客户</span>
+                        <span class="module-tag">VIP客户</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title cyan">合作伙伴</div>
+                    <div class="modules-container">
+                        <span class="module-tag">经销商</span>
+                        <span class="module-tag">代理商</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">第三方系统</div>
+                    <div class="modules-container">
+                        <span class="module-tag">ERP系统</span>
+                        <span class="module-tag">电商平台</span>
+                        <span class="module-tag">呼叫中心</span>
+                        <span class="module-tag">BI工具</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心系统层 -->
+            <div class="row-label">核心系统层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户主数据</span>
+                        <span class="module-tag">客户标签引擎</span>
+                        <span class="module-tag">客户画像</span>
+                        <span class="module-tag">客户360</span>
+                        <span class="module-tag">公海池管理</span>
+                        <span class="module-tag">客户合并/去重</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索管理</span>
+                        <span class="module-tag">商机管理</span>
+                        <span class="module-tag">报价管理</span>
+                        <span class="module-tag">合同管理</span>
+                        <span class="module-tag">订单管理</span>
+                        <span class="module-tag">回款管理</span>
+                        <span class="module-tag">销售预测</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">营销中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">营销活动</span>
+                        <span class="module-tag">客户旅程</span>
+                        <span class="module-tag">内容库</span>
+                        <span class="module-tag">邮件营销</span>
+                        <span class="module-tag">短信营销</span>
+                        <span class="module-tag">微信营销</span>
+                        <span class="module-tag">营销自动化</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单系统</span>
+                        <span class="module-tag">知识库</span>
+                        <span class="module-tag">在线客服</span>
+                        <span class="module-tag">呼叫中心</span>
+                        <span class="module-tag">满意度调查</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">产品中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">产品管理</span>
+                        <span class="module-tag">价格管理</span>
+                        <span class="module-tag">库存管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">互动中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">通话管理</span>
+                        <span class="module-tag">邮件管理</span>
+                        <span class="module-tag">短信管理</span>
+                        <span class="module-tag">微信管理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户查看</span>
+                        <span class="module-tag">客户画像</span>
+                        <span class="module-tag">拜访记录</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索管理</span>
+                        <span class="module-tag">商机跟进</span>
+                        <span class="module-tag">合同审批</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单处理</span>
+                        <span class="module-tag">客户反馈</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">个人信息</span>
+                        <span class="module-tag">订单查询</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单提交</span>
+                        <span class="module-tag">进度查询</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">API接口</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户API</span>
+                        <span class="module-tag">订单API</span>
+                        <span class="module-tag">合同API</span>
+                        <span class="module-tag">工单API</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 业务支撑层 -->
+            <div class="row-label">业务支撑层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">工作流引擎</div>
+                    <div class="modules-container">
+                        <span class="module-tag">流程设计</span>
+                        <span class="module-tag">流程执行</span>
+                        <span class="module-tag">流程监控</span>
+                        <span class="module-tag">合同审批</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">搜索引擎</div>
+                    <div class="modules-container">
+                        <span class="module-tag">全文搜索</span>
+                        <span class="module-tag">客户搜索</span>
+                        <span class="module-tag">智能推荐</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">通知服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">站内消息</span>
+                        <span class="module-tag">邮件通知</span>
+                        <span class="module-tag">短信通知</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">工作流引擎</div>
+                    <div class="modules-container">
+                        <span class="module-tag">合同审批</span>
+                        <span class="module-tag">报价审批</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">搜索引擎</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户搜索</span>
+                        <span class="module-tag">快速查找</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">通知服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">消息推送</span>
+                        <span class="module-tag">任务提醒</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">通知服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">短信通知</span>
+                        <span class="module-tag">站内消息</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">集成平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">RESTful API</span>
+                        <span class="module-tag">Webhook</span>
+                        <span class="module-tag">批量接口</span>
+                        <span class="module-tag">数据同步</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据层 -->
+            <div class="row-label">数据层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户表</span>
+                        <span class="module-tag">联系人表</span>
+                        <span class="module-tag">客户标签表</span>
+                        <span class="module-tag">客户行为表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索表</span>
+                        <span class="module-tag">商机表</span>
+                        <span class="module-tag">合同表</span>
+                        <span class="module-tag">订单表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">营销数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">活动表</span>
+                        <span class="module-tag">旅程表</span>
+                        <span class="module-tag">营销记录表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单表</span>
+                        <span class="module-tag">知识库表</span>
+                        <span class="module-tag">反馈表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">互动数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">通话记录表</span>
+                        <span class="module-tag">邮件表</span>
+                        <span class="module-tag">短信表</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户表</span>
+                        <span class="module-tag">拜访记录表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">销售数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">线索表</span>
+                        <span class="module-tag">商机表</span>
+                        <span class="module-tag">合同表</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户表</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title orange">服务数据域</div>
+                    <div class="modules-container">
+                        <span class="module-tag">工单表</span>
+                        <span class="module-tag">反馈表</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">数据接口</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户数据接口</span>
+                        <span class="module-tag">订单数据接口</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 基础设施层 -->
+            <div class="row-label">基础设施层</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">用户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">用户认证</span>
+                        <span class="module-tag">单点登录</span>
+                        <span class="module-tag">权限管理</span>
+                        <span class="module-tag">组织架构</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">文件服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">文件上传</span>
+                        <span class="module-tag">文件存储</span>
+                        <span class="module-tag">文件预览</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">集成平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">API网关</span>
+                        <span class="module-tag">数据同步</span>
+                        <span class="module-tag">ETL</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title purple">BI平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">数据仓库</span>
+                        <span class="module-tag">OLAP引擎</span>
+                        <span class="module-tag">报表引擎</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">用户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">用户认证</span>
+                        <span class="module-tag">移动端权限</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">文件服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">拍照上传</span>
+                        <span class="module-tag">文件查看</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">集成平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">离线同步</span>
+                        <span class="module-tag">数据推送</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">用户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">用户登录</span>
+                        <span class="module-tag">基本信息</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">文件服务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">文件下载</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title cyan">API网关</div>
+                    <div class="modules-container">
+                        <span class="module-tag">鉴权服务</span>
+                        <span class="module-tag">限流服务</span>
+                        <span class="module-tag">日志服务</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">业务场景</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">角色类型</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">核心系统</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">数据域</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4</div>
+                <div class="stat-label">终端平台</div>
+            </div>
+            <div class="stat-value">150+</div>
+            <div class="stat-label">功能模块</div>
+        </div>
+    </div>
+
+    <script>
+        function exportToPDF() {
+            alert('导出 PDF 说明：\n\n1. 使用浏览器的"打印"功能\n2. 选择"另存为 PDF"\n3. 建议选择 A3 纸张、横向打印\n4. 启用"背景图形"选项');
+            window.print();
+        }
+
+        function toggleStats() {
+            const stats = document.getElementById('stats');
+            if (stats.style.display === 'none') {
+                stats.style.display = 'grid';
+            } else {
+                stats.style.display = 'none';
+            }
+        }
+
+        // 模块点击交互
+        document.querySelectorAll('.module-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const moduleName = this.textContent;
+                console.log('Clicked module:', moduleName);
+                // 可以添加更多交互逻辑，如显示模块详情
+            });
+        });
+
+        // 分组标题点击折叠
+        document.querySelectorAll('.group-title').forEach(title => {
+            title.addEventListener('click', function() {
+                const modules = this.nextElementSibling;
+                if (modules && modules.style.display === 'none') {
+                    modules.style.display = 'flex';
+                } else if (modules) {
+                    modules.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

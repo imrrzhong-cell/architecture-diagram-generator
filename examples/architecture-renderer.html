@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九九电商平台产品完整架构</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica', 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #4A90E2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(3, 1fr);
+            gap: 2px;
+            background: #E0E0E0;
+            padding: 2px;
+        }
+
+        .row-label {
+            background: #F0F0F0;
+            padding: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+        }
+
+        .column-header {
+            background: #4A90E2;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cell {
+            background: white;
+            padding: 8px;
+            min-height: 60px;
+        }
+
+        .cell-group {
+            margin-bottom: 8px;
+        }
+
+        .cell-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .group-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 4px;
+            padding: 4px 8px;
+            border-radius: 2px;
+        }
+
+        .group-title.blue {
+            background: #4A90E2;
+            color: white;
+        }
+
+        .group-title.pink {
+            background: #FF69B4;
+            color: white;
+        }
+
+        .group-title.green {
+            background: #52C41A;
+            color: white;
+        }
+
+        .group-title.gray {
+            background: #8C8C8C;
+            color: white;
+        }
+
+        .modules-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .module-tag {
+            display: inline-block;
+            padding: 3px 6px;
+            background: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 2px;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .module-tag:hover {
+            background: #E8F4FF;
+            border-color: #4A90E2;
+            cursor: pointer;
+        }
+
+        .export-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .export-controls h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .export-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            margin-bottom: 8px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .export-btn:hover {
+            background: #357ABD;
+        }
+
+        .export-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        @media print {
+            .export-controls {
+                display: none;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        @media screen and (max-width: 1200px) {
+            .architecture-grid {
+                grid-template-columns: 150px repeat(3, 1fr);
+            }
+
+            .module-tag {
+                font-size: 10px;
+                padding: 2px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="export-controls">
+        <h3>导出选项</h3>
+        <button class="export-btn" onclick="exportToPDF()">导出为 PDF</button>
+        <button class="export-btn" onclick="exportToPNG()">导出为 PNG</button>
+        <button class="export-btn" onclick="exportToSVG()">导出为 SVG</button>
+        <button class="export-btn" onclick="window.print()">打印</button>
+    </div>
+
+    <div class="container" id="architecture">
+        <div class="header">九九电商平台产品完整架构</div>
+
+        <div class="architecture-grid">
+            <!-- Row Headers and Cells -->
+            <!-- Row 1: 交易平台类型 -->
+            <div class="row-label">交易平台类型</div>
+            <div class="column-header">PC站</div>
+            <div class="column-header">移动端APP</div>
+            <div class="column-header">小程序</div>
+
+            <!-- Row 2: 业务场景 -->
+            <div class="row-label">业务场景</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">供给业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">调拨业务</span>
+                        <span class="module-tag">推产业务</span>
+                        <span class="module-tag">开店营销</span>
+                        <span class="module-tag">上架接单</span>
+                        <span class="module-tag">黄金流盘</span>
+                        <span class="module-tag">智能采购</span>
+                        <span class="module-tag">平台运营</span>
+                        <span class="module-tag">合同协同</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">控销业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">控销业务</span>
+                        <span class="module-tag">合营业务</span>
+                        <span class="module-tag">对账开票</span>
+                        <span class="module-tag">履约结算</span>
+                        <span class="module-tag">经营赋能</span>
+                        <span class="module-tag">金融支付</span>
+                        <span class="module-tag">客户生命周期运营</span>
+                        <span class="module-tag">平台设置/健康度</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">供给业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">调拨业务</span>
+                        <span class="module-tag">推产业务</span>
+                        <span class="module-tag">开店营销</span>
+                        <span class="module-tag">上架接单</span>
+                        <span class="module-tag">智能采购</span>
+                        <span class="module-tag">平台运营</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">控销业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">控销业务</span>
+                        <span class="module-tag">合营业务</span>
+                        <span class="module-tag">对账开票</span>
+                        <span class="module-tag">履约结算</span>
+                        <span class="module-tag">经营赋能</span>
+                        <span class="module-tag">金融支付</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">供给业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">开店营销</span>
+                        <span class="module-tag">上架接单</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">控销业务</div>
+                    <div class="modules-container">
+                        <span class="module-tag">控销业务</span>
+                        <span class="module-tag">合营业务</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: 用户角色 -->
+            <div class="row-label">用户角色</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">上游工业</div>
+                    <div class="modules-container">
+                        <span class="module-tag">大物流品种</span>
+                        <span class="module-tag">合营品种</span>
+                        <span class="module-tag">平台商户</span>
+                        <span class="module-tag">自营商户</span>
+                        <span class="module-tag">三方商户</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title pink">下游客户</div>
+                    <div class="modules-container">
+                        <span class="module-tag">单体药店</span>
+                        <span class="module-tag">中小连锁</span>
+                        <span class="module-tag">开放平台(ISV)</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">地址</span>
+                        <span class="module-tag">营销</span>
+                        <span class="module-tag">采购</span>
+                        <span class="module-tag">财务</span>
+                        <span class="module-tag">物流</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">合作伙伴</div>
+                    <div class="modules-container">
+                        <span class="module-tag">物流服务商</span>
+                        <span class="module-tag">金融服务商</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">其他</div>
+                    <div class="modules-container">
+                        <span class="module-tag">支付服务商</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">上游工业</div>
+                    <div class="modules-container">
+                        <span class="module-tag">平台商户</span>
+                        <span class="module-tag">自营商户</span>
+                        <span class="module-tag">三方商户</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title pink">下游客户</div>
+                    <div class="modules-container">
+                        <span class="module-tag">单体药店</span>
+                        <span class="module-tag">中小连锁</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">营销</span>
+                        <span class="module-tag">采购</span>
+                        <span class="module-tag">财务</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title pink">下游客户</div>
+                    <div class="modules-container">
+                        <span class="module-tag">单体药店</span>
+                        <span class="module-tag">中小连锁</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">营销</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: 业务运营系统 -->
+            <div class="row-label">业务运营系统</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">注册建档</span>
+                        <span class="module-tag">客户标签</span>
+                        <span class="module-tag">会员管理</span>
+                        <span class="module-tag">主营品类</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">商品中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">商品主数据</span>
+                        <span class="module-tag">对码服务</span>
+                        <span class="module-tag">比价管理</span>
+                        <span class="module-tag">品类管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">价格中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">价格中心</span>
+                        <span class="module-tag">黄金内容</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">平台直播</div>
+                    <div class="modules-container">
+                        <span class="module-tag">自营店铺</span>
+                        <span class="module-tag">直播运营</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">店铺中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">旗舰店</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">三方店铺</div>
+                    <div class="modules-container">
+                        <span class="module-tag">三方店铺</span>
+                        <span class="module-tag">运营后台</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">客服中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">呼叫中心</span>
+                        <span class="module-tag">任务中心</span>
+                        <span class="module-tag">知识库</span>
+                        <span class="module-tag">问题库</span>
+                        <span class="module-tag">问询销售</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">IM系统</div>
+                    <div class="modules-container">
+                        <span class="module-tag">IM系统</span>
+                        <span class="module-tag">投诉系统</span>
+                        <span class="module-tag">客服管理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">客户标签</span>
+                        <span class="module-tag">会员管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">商品中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">商品主数据</span>
+                        <span class="module-tag">比价管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">价格中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">价格中心</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">平台直播</div>
+                    <div class="modules-container">
+                        <span class="module-tag">直播运营</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">店铺中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">旗舰店</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">三方店铺</div>
+                    <div class="modules-container">
+                        <span class="module-tag">三方店铺</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">客服中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">任务中心</span>
+                        <span class="module-tag">知识库</span>
+                        <span class="module-tag">问询销售</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">IM系统</div>
+                    <div class="modules-container">
+                        <span class="module-tag">IM系统</span>
+                        <span class="module-tag">客服管理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">客户中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">会员管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">商品中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">商品主数据</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">价格中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">价格中心</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">店铺中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">旗舰店</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">三方店铺</div>
+                    <div class="modules-container">
+                        <span class="module-tag">三方店铺</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">客服中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">知识库</span>
+                        <span class="module-tag">问询销售</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: 交易及履约系统 -->
+            <div class="row-label">交易及履约系统</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">订单规则</div>
+                    <div class="modules-container">
+                        <span class="module-tag">订单规则</span>
+                        <span class="module-tag">订单状态</span>
+                        <span class="module-tag">订单创建</span>
+                        <span class="module-tag">拆分打标</span>
+                        <span class="module-tag">订单转移</span>
+                        <span class="module-tag">履约控制</span>
+                        <span class="module-tag">订单台账</span>
+                        <span class="module-tag">订单管理</span>
+                        <span class="module-tag">订单结算</span>
+                        <span class="module-tag">订单售后</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">寻源策略</span>
+                        <span class="module-tag">供应商库及主数据</span>
+                        <span class="module-tag">供应商评价及绩效</span>
+                        <span class="module-tag">采购策略管理</span>
+                        <span class="module-tag">物流系统</span>
+                        <span class="module-tag">出入库管理</span>
+                        <span class="module-tag">库位管理</span>
+                        <span class="module-tag">库存管理</span>
+                        <span class="module-tag">订单台账</span>
+                        <span class="module-tag">运输计划</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购协同</div>
+                    <div class="modules-container">
+                        <span class="module-tag">采购协同</span>
+                        <span class="module-tag">电子报投标</span>
+                        <span class="module-tag">行业监测</span>
+                        <span class="module-tag">开放平台</span>
+                        <span class="module-tag">仓内作业管理</span>
+                        <span class="module-tag">盘库管理</span>
+                        <span class="module-tag">盘库转移</span>
+                        <span class="module-tag">车辆调度</span>
+                        <span class="module-tag">运输执行</span>
+                        <span class="module-tag">运输计划</span>
+                        <span class="module-tag">成本核算</span>
+                        <span class="module-tag">分摊管理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">订单规则</div>
+                    <div class="modules-container">
+                        <span class="module-tag">订单创建</span>
+                        <span class="module-tag">订单管理</span>
+                        <span class="module-tag">订单结算</span>
+                        <span class="module-tag">订单售后</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">供应商库及主数据</span>
+                        <span class="module-tag">库存管理</span>
+                        <span class="module-tag">订单台账</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购协同</div>
+                    <div class="modules-container">
+                        <span class="module-tag">采购协同</span>
+                        <span class="module-tag">运输执行</span>
+                        <span class="module-tag">成本核算</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">订单规则</div>
+                    <div class="modules-container">
+                        <span class="module-tag">订单创建</span>
+                        <span class="module-tag">订单管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">库存管理</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6: 供应链系统 -->
+            <div class="row-label">供应链系统</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">寻源策略</span>
+                        <span class="module-tag">供应商库及主数据</span>
+                        <span class="module-tag">供应商评价及绩效</span>
+                        <span class="module-tag">采购策略管理</span>
+                        <span class="module-tag">物流系统</span>
+                        <span class="module-tag">出入库管理</span>
+                        <span class="module-tag">库位管理</span>
+                        <span class="module-tag">库存管理</span>
+                        <span class="module-tag">订单台账</span>
+                        <span class="module-tag">运输计划</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购协同</div>
+                    <div class="modules-container">
+                        <span class="module-tag">采购协同</span>
+                        <span class="module-tag">电子报投标</span>
+                        <span class="module-tag">行业监测</span>
+                        <span class="module-tag">开放平台</span>
+                        <span class="module-tag">仓内作业管理</span>
+                        <span class="module-tag">盘库管理</span>
+                        <span class="module-tag">盘库转移</span>
+                        <span class="module-tag">车辆调度</span>
+                        <span class="module-tag">运输执行</span>
+                        <span class="module-tag">运输计划</span>
+                        <span class="module-tag">成本核算</span>
+                        <span class="module-tag">分摊管理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">供应商库及主数据</span>
+                        <span class="module-tag">库存管理</span>
+                        <span class="module-tag">订单台账</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">采购协同</div>
+                    <div class="modules-container">
+                        <span class="module-tag">采购协同</span>
+                        <span class="module-tag">运输执行</span>
+                        <span class="module-tag">成本核算</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title green">采购中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">库存管理</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 7: 经营决策系统(BI) -->
+            <div class="row-label">经营决策系统(BI)</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">数据平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">数据采集</span>
+                        <span class="module-tag">数据梳理</span>
+                        <span class="module-tag">数据应用</span>
+                        <span class="module-tag">数据管理</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">分析平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">可视化报表</span>
+                        <span class="module-tag">流量分析</span>
+                        <span class="module-tag">交易分析</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title green">专项分析</div>
+                    <div class="modules-container">
+                        <span class="module-tag">物流分析</span>
+                        <span class="module-tag">财务模型</span>
+                        <span class="module-tag">财务分析</span>
+                        <span class="module-tag">营销分析</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">数据应用</div>
+                    <div class="modules-container">
+                        <span class="module-tag">数据应用</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">核心分析</div>
+                    <div class="modules-container">
+                        <span class="module-tag">可视化报表</span>
+                        <span class="module-tag">交易分析</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title gray">报表查看</div>
+                    <div class="modules-container">
+                        <span class="module-tag">可视化报表</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 8: 基础服务平台 -->
+            <div class="row-label">基础服务平台</div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">支付中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">支付配置</span>
+                        <span class="module-tag">渠道管理</span>
+                        <span class="module-tag">费率管理</span>
+                        <span class="module-tag">费用结算</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">财务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">财务管理</span>
+                        <span class="module-tag">全面预算</span>
+                        <span class="module-tag">金融服务</span>
+                        <span class="module-tag">费用结算</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title pink">金融中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">白条/金条</span>
+                        <span class="module-tag">用户画像</span>
+                        <span class="module-tag">风险模型</span>
+                        <span class="module-tag">黄金方</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">开放平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">API</span>
+                        <span class="module-tag">EDI</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">支付中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">支付配置</span>
+                        <span class="module-tag">费用结算</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">财务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">财务管理</span>
+                        <span class="module-tag">费用结算</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title pink">金融中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">用户画像</span>
+                        <span class="module-tag">风险模型</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title gray">开放平台</div>
+                    <div class="modules-container">
+                        <span class="module-tag">API</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="cell-group">
+                    <div class="group-title blue">支付中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">支付配置</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title blue">财务中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">费用结算</span>
+                    </div>
+                </div>
+                <div class="cell-group">
+                    <div class="group-title pink">金融中心</div>
+                    <div class="modules-container">
+                        <span class="module-tag">用户画像</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportToPDF() {
+            alert('准备导出为 PDF...\n\n提示：使用浏览器的"打印"功能，选择"另存为 PDF"即可获得最佳效果。');
+            window.print();
+        }
+
+        function exportToPNG() {
+            alert('导出为 PNG 功能说明：\n\n1. 使用浏览器的截图工具（如 Chrome 开发者工具的节点截图）\n2. 或使用第三方截图工具\n3. 建议在浏览器全屏模式下截图以获得最佳质量');
+        }
+
+        function exportToSVG() {
+            alert('此 HTML 版本已使用响应式设计。\n\n如需 SVG 格式，可以考虑：\n1. 使用在线 HTML 转 SVG 工具\n2. 或使用专业设计工具（如 Figma）重新创建');
+        }
+
+        // 添加模块点击交互
+        document.querySelectorAll('.module-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const moduleName = this.textContent;
+                console.log('Clicked module:', moduleName);
+                // 这里可以添加更多交互逻辑
+            });
+        });
+    </script>
+</body>
+</html>

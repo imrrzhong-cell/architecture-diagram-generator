@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "视觉语法：如何将语义结构映射成可视化图形"
+  },
+
+  "visual_grammar": {
+    "topology_grammar": {
+      "layout_type": "matrix",
+      "structure": {
+        "rows": "business_layers",
+        "columns": "terminals",
+        "cells": "business_units"
+      },
+      "grid_specification": {
+        "total_columns": 3,
+        "column_width": {
+          "PC站": 400,
+          "移动端APP": 400,
+          "小程序": 400
+        },
+        "total_rows": 8,
+        "row_height": "auto",
+        "row_heights": {
+          "交易平台类型": 60,
+          "业务场景": 120,
+          "用户角色": 120,
+          "业务运营系统": 200,
+          "交易及履约系统": 180,
+          "供应链系统": 180,
+          "经营决策系统(BI)": 140,
+          "基础服务平台": 120
+        }
+      },
+      "alignment_rules": {
+        "horizontal": {
+          "rule": "align_by_terminal",
+          "description": "按终端平台水平对齐"
+        },
+        "vertical": {
+          "rule": "align_by_business_layer",
+          "description": "按业务层级垂直对齐"
+        },
+        "cell_alignment": {
+          "horizontal": "left",
+          "vertical": "center",
+          "padding": 8
+        }
+      }
+    },
+
+    "visual_encoding": {
+      "color_encoding": {
+        "strategy": "encode_color_by_domain",
+        "palette": {
+          "blue": {
+            "hex": "#4A90E2",
+            "rgb": [74, 144, 226],
+            "meaning": "核心业务层",
+            "apply_to": ["业务场景", "上游工业", "客户中心", "商品中心", "订单规则", "数据平台"]
+          },
+          "pink": {
+            "hex": "#FF69B4",
+            "rgb": [255, 105, 180],
+            "meaning": "下游客户层",
+            "apply_to": ["下游客户"]
+          },
+          "green": {
+            "hex": "#52C41A",
+            "rgb": [82, 196, 26],
+            "meaning": "运营支撑层",
+            "apply_to": ["价格中心", "物流分析", "财务模型", "财务分析", "营销分析"]
+          },
+          "gray": {
+            "hex": "#8C8C8C",
+            "rgb": [140, 140, 140],
+            "meaning": "平台/工具层",
+            "apply_to": ["平台", "合作伙伴", "其他", "平台直播", "店铺中心", "三方店铺", "客服中心", "IM系统", "可视化报表", "流量分析", "交易分析", "开放平台"]
+          }
+        }
+      },
+      "border_encoding": {
+        "strategy": "encode_border_by_system_type",
+        "rules": {
+          "core_system": {
+            "border_width": 2,
+            "border_color": "#4A90E2",
+            "border_style": "solid"
+          },
+          "support_system": {
+            "border_width": 1,
+            "border_color": "#8C8C8C",
+            "border_style": "dashed"
+          },
+          "infrastructure": {
+            "border_width": 1,
+            "border_color": "#52C41A",
+            "border_style": "solid"
+          }
+        }
+      },
+      "font_encoding": {
+        "strategy": "encode_font_weight_by_hierarchy",
+        "rules": {
+          "level_1": {
+            "font_size": 24,
+            "font_weight": "bold",
+            "color": "#000000"
+          },
+          "level_2": {
+            "font_size": 18,
+            "font_weight": "600",
+            "color": "#333333"
+          },
+          "level_3": {
+            "font_size": 16,
+            "font_weight": "500",
+            "color": "#333333"
+          },
+          "level_4": {
+            "font_size": 14,
+            "font_weight": "normal",
+            "color": "#666666"
+          },
+          "body": {
+            "font_size": 12,
+            "font_weight": "normal",
+            "color": "#666666"
+          }
+        }
+      },
+      "spacing_encoding": {
+        "strategy": "encode_spacing_by_semantic_grouping",
+        "rules": {
+          "cell_padding": 8,
+          "row_gap": 2,
+          "column_gap": 2,
+          "section_margin": 16,
+          "group_margin": 8
+        }
+      }
+    },
+
+    "layout_constraints": {
+      "information_density": {
+        "min_cells_per_row": 3,
+        "max_cells_per_row": 7,
+        "label_max_length": 16,
+        "cell_min_width": 120,
+        "cell_min_height": 40
+      },
+      "readability": {
+        "max_modules_per_cell": 10,
+        "text_line_height": 1.5,
+        "character_spacing": 0
+      },
+      "visual_hierarchy": {
+        "preserve_row_continuity": true,
+        "preserve_cell_boundaries": true,
+        "group_related_modules": true,
+        "maintain_consistent_spacing": true
+      }
+    },
+
+    "rendering_grammar": {
+      "design_principles": {
+        "no_icons": true,
+        "no_gradients": true,
+        "no_shadows": true,
+        "flat_design": true,
+        "no_visual_noise": true,
+        "minimalist": true
+      },
+      "typography": {
+        "font_family": ["PingFang SC", "Helvetica", "Arial", "sans-serif"],
+        "font_smoothing": "antialiased",
+        "text_align": "left",
+        "line_height": 1.5
+      },
+      "grid_system": {
+        "type": "flexible",
+        "columns": 3,
+        "gutter": 2,
+        "margin": 16
+      },
+      "components": {
+        "header": {
+          "background_color": "#4A90E2",
+          "text_color": "#FFFFFF",
+          "height": 60,
+          "alignment": "center"
+        },
+        "section_title": {
+          "background_color": "#F0F0F0",
+          "text_color": "#333333",
+          "font_weight": "600",
+          "padding": 8
+        },
+        "cell": {
+          "background_color": "#FFFFFF",
+          "border_width": 1,
+          "border_color": "#E0E0E0",
+          "border_radius": 4,
+          "padding": 8
+        },
+        "module_tag": {
+          "display": "inline-block",
+          "padding": "4px 8px",
+          "margin": "2px",
+          "background_color": "#F5F5F5",
+          "border_radius": 2,
+          "font_size": 12
+        }
+      }
+    },
+
+    "interaction_design": {
+      "hover_effects": {
+        "cell_hover": {
+          "background_color": "#F8F8F8",
+          "cursor": "pointer"
+        },
+        "module_hover": {
+          "background_color": "#E8F4FF",
+          "cursor": "pointer"
+        }
+      },
+      "selection_indicators": {
+        "selected_cell": {
+          "border_color": "#4A90E2",
+          "border_width": 2
+        }
+      }
+    },
+
+    "accessibility": {
+      "color_contrast": {
+        "minimum_ratio": 4.5,
+        "text_on_background": true
+      },
+      "text_alternatives": {
+        "provide_alt_text": true,
+        "descriptive_labels": true
+      },
+      "keyboard_navigation": {
+        "tab_index": true,
+        "focus_indicators": true
+      }
+    },
+
+    "export_settings": {
+      "formats": ["PNG", "SVG", "PDF"],
+      "dpi": 300,
+      "color_space": "RGB",
+      "compression": "lossless",
+      "dimensions": {
+        "width": 1200,
+        "height": 1600,
+        "maintain_aspect_ratio": true
+      }
+    }
+  }
+}
